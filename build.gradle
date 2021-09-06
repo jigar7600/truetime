@@ -1,0 +1,37 @@
+buildscript {
+    ext{
+        kotlin_version = '1.4.20'
+        coroutines_version = '1.4.1'
+    }
+
+    repositories {
+        google()
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:4.1.1'
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+ext {
+    minSdkVersion = 9
+    targetSdkVersion = 31
+    compileSdkVersion = 31
+
+    versionCode = 12
+    versionName = '4.5'
+}
+
+allprojects {
+    repositories {
+        google()
+        jcenter()
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
