@@ -1,11 +1,7 @@
 package ga.jigar.library.truetime
 
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import ga.jigar.library.truetime.legacy.TrueLog
-import ga.jigar.library.truetime.legacy.TrueTime
-
+//Replaced with Restart.
+/*
 class BootCompletedBroadcastReceiver : BroadcastReceiver() {
 
     companion object {
@@ -19,3 +15,4 @@ class BootCompletedBroadcastReceiver : BroadcastReceiver() {
         }
     }
 }
+*/

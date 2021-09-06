@@ -1,6 +1,10 @@
 package ga.jigar.library.truetime.legacy;
 
+import static android.content.Context.MODE_PRIVATE;
+
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.SystemClock;
 import android.provider.Settings;
@@ -138,6 +142,14 @@ public class TrueTime {
         return cachedSntpTime;
     }
 
+    /*
+    * Get power off system time from time cache.
+    * */
+    public static long getSystemTime(Context context) {
+        SharedPreferences pref = context.getSharedPreferences(CacheInterface.KEY_PREFERENCES, MODE_PRIVATE);
+        return pref.getLong(CacheInterface.KEY_CACHED_SYSTEM_TIME, 0L);
+    }
+
     public void initialize() throws IOException {
         initialize(_ntpHost);
     }
@@ -186,6 +198,8 @@ public class TrueTime {
         return INSTANCE;
     }
 
+    // -----------------------------------------------------------------------------------
+
     public synchronized TrueTime withRootDispersionMax(float rootDispersionMax) {
         if (rootDispersionMax > _rootDispersionMax) {
             String log = String.format(Locale.getDefault(),
@@ -197,8 +211,6 @@ public class TrueTime {
         _rootDispersionMax = rootDispersionMax;
         return INSTANCE;
     }
-
-    // -----------------------------------------------------------------------------------
 
     public synchronized TrueTime withServerResponseDelayMax(int serverResponseDelayInMillis) {
         _serverResponseDelayMax = serverResponseDelayInMillis;
@@ -237,6 +249,7 @@ public class TrueTime {
         SNTP_CLIENT.cacheTrueTimeInfo(response);
     }
 
+    @SuppressLint("NewApi")
     public void checkBootId(Context context) {
         String cachedBootId = DISK_CACHE_CLIENT.getCachedBootId();
 
@@ -256,8 +269,7 @@ public class TrueTime {
             }
 
         } else {
-            try (BufferedReader bufferedReader = new BufferedReader(
-                    new FileReader("proc/sys/kernel/random/boot_id"))) {
+            try (BufferedReader bufferedReader = new BufferedReader(new FileReader("proc/sys/kernel/random/boot_id"))) {
 
                 StringBuilder bootId = new StringBuilder();
                 String line;

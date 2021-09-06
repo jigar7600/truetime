@@ -110,6 +110,8 @@ class GuideActivity : AppCompatActivity() {
     private fun kickOffTrueTimeOffline() {
         binding.deviceOffline.text = "TrueTime (offline) : (loading...)"
 
+        val lastOfflineTime = TrueTime.getSystemTime(this)
+        Log.i("TrueTimeOffline: ", lastOfflineTime.toString())
         val date = TrueTime.Offline()
         val dateUp = TrueTime.OfflineUp()
         binding.deviceOffline.text =

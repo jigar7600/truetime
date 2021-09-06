@@ -2,7 +2,7 @@ package ga.jigar.library.truetime.time
 
 import android.os.SystemClock
 import ga.jigar.library.truetime.sntp.Sntp
-import java.util.Date
+import java.util.*
 import java.util.concurrent.atomic.AtomicReference
 
 // TODO: move android dependency to separate package
@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicReference
  * and derives true time from that result
  */
 internal class TimeKeeper(
-        private val sntp: Sntp
+    private val sntp: Sntp
 ) {
     private var ttResult: AtomicReference<LongArray> = AtomicReference()
 

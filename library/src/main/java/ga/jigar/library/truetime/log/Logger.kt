@@ -13,7 +13,7 @@ object LoggerNoOp : Logger {
         // no-op
     }
 
-     override fun d(tag: String, msg: String) {
+    override fun d(tag: String, msg: String) {
         // no-op
     }
 

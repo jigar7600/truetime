@@ -4,17 +4,13 @@ import ga.jigar.library.truetime.log.Logger
 import ga.jigar.library.truetime.log.LoggerNoOp
 import ga.jigar.library.truetime.sntp.Sntp
 import ga.jigar.library.truetime.sntp.SntpImpl
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import java.net.InetAddress
 import java.net.UnknownHostException
-import java.util.Date
+import java.util.*
 
 class TrueTimeImpl(
-        private val logger: Logger = LoggerNoOp,
+    private val logger: Logger = LoggerNoOp,
 ) : TrueTime2 {
 
     private val sntp: Sntp = SntpImpl(logger)
@@ -102,8 +98,8 @@ class TrueTimeImpl(
     }
 
     private fun requestTime(
-            with: TrueTimeParameters,
-            ipHostAddress: String,
+        with: TrueTimeParameters,
+        ipHostAddress: String,
     ): LongArray {
         // retrying upto (default 50) times if necessary
         repeat(with.retryCountAgainstSingleIp - 1) {
@@ -122,8 +118,8 @@ class TrueTimeImpl(
     }
 
     private fun sntpRequest(
-            with: TrueTimeParameters,
-            ipHostAddress: String,
+        with: TrueTimeParameters,
+        ipHostAddress: String,
     ): LongArray = sntp.requestTime(
         ntpHostAddress = ipHostAddress,
         rootDelayMax = with.rootDelayMax,

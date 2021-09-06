@@ -7,7 +7,7 @@ import android.content.SharedPreferences
 internal class SharedPreferenceCacheImpl(context: Context) : CacheInterface {
 
     companion object {
-        private const val KEY_CACHED_SHARED_PREFS = "ga.jigar.library.truetime.shared_preferences"
+        private const val KEY_CACHED_SHARED_PREFS = CacheInterface.KEY_PREFERENCES
     }
 
     private val _sharedPreferences: SharedPreferences
@@ -36,6 +36,8 @@ internal class SharedPreferenceCacheImpl(context: Context) : CacheInterface {
         remove(CacheInterface.KEY_CACHED_BOOT_TIME)
         remove(CacheInterface.KEY_CACHED_DEVICE_UPTIME)
         remove(CacheInterface.KEY_CACHED_SNTP_TIME)
+        remove(CacheInterface.KEY_CACHED_SYSTEM_TIME)
+        remove(CacheInterface.KEY_CACHED_BOOT_ID)
     }
 
     private fun remove(keyCachedBootTime: String) {

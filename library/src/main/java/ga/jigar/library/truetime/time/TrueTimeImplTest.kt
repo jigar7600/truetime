@@ -44,7 +44,7 @@ class TrueTimeImplTest {
     6 = 1
     7 = 704562670
 
-     sorted by clock offset
+    sorted by clock offset
 
     0 = 1606352816644
     1 = 1606352816116

@@ -1,7 +1,7 @@
 package ga.jigar.library.truetime.time
 
 import kotlinx.coroutines.Job
-import java.util.Date
+import java.util.*
 
 interface TrueTime2 {
 

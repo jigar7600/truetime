@@ -65,13 +65,13 @@ internal class DiskCacheClient {
         val bootTime = cachedSntpTime - cachedDeviceUptime
 
         TrueLog.d(
-                TAG,
-                String.format(
-                        "Caching true time info to disk sntp [%s] device [%s] boot [%s]",
-                        cachedSntpTime,
-                        cachedDeviceUptime,
-                        bootTime
-                )
+            TAG,
+            String.format(
+                "Caching true time info to disk sntp [%s] device [%s] boot [%s]",
+                cachedSntpTime,
+                cachedDeviceUptime,
+                bootTime
+            )
         )
 
         _cacheInterface?.put(CacheInterface.KEY_CACHED_BOOT_TIME, bootTime)
@@ -96,7 +96,10 @@ internal class DiskCacheClient {
 
     private fun cacheUnavailable(): Boolean {
         if (_cacheInterface == null) {
-            TrueLog.w(TAG, "Cannot use disk caching strategy for TrueTime. CacheInterface unavailable")
+            TrueLog.w(
+                TAG,
+                "Cannot use disk caching strategy for TrueTime. CacheInterface unavailable"
+            )
             return true
         }
         return false

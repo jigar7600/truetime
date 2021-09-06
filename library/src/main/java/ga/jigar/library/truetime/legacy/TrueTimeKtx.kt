@@ -109,10 +109,10 @@ class TrueTimeKtx : TrueTime() {
      */
     fun initializeNtp(ntpPool: String): Single<LongArray> {
         return Flowable
-                .just(ntpPool)
-                .compose(resolveNtpPoolToIpAddresses())
-                .compose(performNtpAlgorithm())
-                .firstOrError()
+            .just(ntpPool)
+            .compose(resolveNtpPoolToIpAddresses())
+            .compose(performNtpAlgorithm())
+            .firstOrError()
     }
 
     /**
@@ -128,8 +128,8 @@ class TrueTimeKtx : TrueTime() {
      */
     fun initializeNtp(resolvedNtpAddresses: List<InetAddress>): Single<LongArray> {
         return Flowable.fromIterable(resolvedNtpAddresses)
-                .compose(performNtpAlgorithm())
-                .firstOrError()
+            .compose(performNtpAlgorithm())
+            .firstOrError()
     }
 
     /**
@@ -139,60 +139,66 @@ class TrueTimeKtx : TrueTime() {
     private fun performNtpAlgorithm(): FlowableTransformer<InetAddress, LongArray> {
         return FlowableTransformer { inetAddressObservable ->
             inetAddressObservable
-                    .map { inetAddress -> inetAddress.hostAddress }
-                    .flatMap(bestResponseAgainstSingleIp(5))  // get best response from querying the ip 5 times
-                    .take(5)                                  // take 5 of the best results
-                    .toList()
-                    .toFlowable()
-                    .filter { longs -> longs.size > 0 }
-                    .map(filterMedianResponse())
-                    .doOnNext { ntpResponse ->
-                        cacheTrueTimeInfo(ntpResponse)
-                        TrueTime.saveTrueTimeInfoToDisk()
-                    }
+                .map { inetAddress -> inetAddress.hostAddress }
+                .flatMap(bestResponseAgainstSingleIp(5))  // get best response from querying the ip 5 times
+                .take(5)                                  // take 5 of the best results
+                .toList()
+                .toFlowable()
+                .filter { longs -> longs.size > 0 }
+                .map(filterMedianResponse())
+                .doOnNext { ntpResponse ->
+                    cacheTrueTimeInfo(ntpResponse)
+                    TrueTime.saveTrueTimeInfoToDisk()
+                }
         }
     }
 
     private fun resolveNtpPoolToIpAddresses(): FlowableTransformer<String, InetAddress> {
         return FlowableTransformer { ntpPoolFlowable ->
             ntpPoolFlowable
-                    .observeOn(Schedulers.io())
-                    .flatMap(Function<String, Flowable<InetAddress>> { ntpPoolAddress ->
-                        try {
-                            TrueLog.d(TAG, "---- resolving ntpHost : $ntpPoolAddress")
-                            return@Function Flowable.fromArray(*InetAddress.getAllByName(ntpPoolAddress))
-                        } catch (e: UnknownHostException) {
-                            return@Function Flowable.error(e)
-                        }
-                    })
+                .observeOn(Schedulers.io())
+                .flatMap(Function<String, Flowable<InetAddress>> { ntpPoolAddress ->
+                    try {
+                        TrueLog.d(TAG, "---- resolving ntpHost : $ntpPoolAddress")
+                        return@Function Flowable.fromArray(*InetAddress.getAllByName(ntpPoolAddress))
+                    } catch (e: UnknownHostException) {
+                        return@Function Flowable.error(e)
+                    }
+                })
         }
     }
 
     private fun bestResponseAgainstSingleIp(repeatCount: Int): Function<String, Flowable<LongArray>> {
         return Function { singleIp ->
             Flowable
-                    .just(singleIp)
-                    .repeat(repeatCount.toLong())
-                    .flatMap { singleIpHostAddress ->
-                        Flowable.create(FlowableOnSubscribe<LongArray> { o ->
-                            TrueLog.d(
-                                    TAG,
-                                    "---- requestTime from: $singleIpHostAddress"
+                .just(singleIp)
+                .repeat(repeatCount.toLong())
+                .flatMap { singleIpHostAddress ->
+                    Flowable.create(FlowableOnSubscribe<LongArray> { o ->
+                        TrueLog.d(
+                            TAG,
+                            "---- requestTime from: $singleIpHostAddress"
+                        )
+                        try {
+                            o.onNext(requestTime(singleIpHostAddress))
+                            o.onComplete()
+                        } catch (e: IOException) {
+                            o.tryOnError(e)
+                        }
+                    }, BackpressureStrategy.BUFFER)
+                        .subscribeOn(Schedulers.io())
+                        .doOnError { throwable ->
+                            TrueLog.e(
+                                TAG,
+                                "---- Error requesting time",
+                                throwable
                             )
-                            try {
-                                o.onNext(requestTime(singleIpHostAddress))
-                                o.onComplete()
-                            } catch (e: IOException) {
-                                o.tryOnError(e)
-                            }
-                        }, BackpressureStrategy.BUFFER)
-                                .subscribeOn(Schedulers.io())
-                                .doOnError { throwable -> TrueLog.e(TAG, "---- Error requesting time", throwable) }
-                                .retry(_retryCount.toLong())
-                    }
-                    .toList()
-                    .toFlowable()
-                    .map(filterLeastRoundTripDelay()) // pick best response for each ip
+                        }
+                        .retry(_retryCount.toLong())
+                }
+                .toList()
+                .toFlowable()
+                .map(filterLeastRoundTripDelay()) // pick best response for each ip
         }
     }
 
@@ -218,7 +224,10 @@ class TrueTimeKtx : TrueTime() {
                 if (lhs < rhs) -1 else if (lhs == rhs) 0 else 1
             }
 
-            TrueLog.d(TAG, "---- bestResponse: " + Arrays.toString(bestResponses[bestResponses.size / 2]))
+            TrueLog.d(
+                TAG,
+                "---- bestResponse: " + Arrays.toString(bestResponses[bestResponses.size / 2])
+            )
 
             bestResponses[bestResponses.size / 2]
         }
